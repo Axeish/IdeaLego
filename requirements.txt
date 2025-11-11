@@ -1,0 +1,14 @@
+# Core Framework
+fastapi>=0.115.0
+
+# ASGI Server
+uvicorn[standard]>=0.30.0
+
+# Data Validation (comes with FastAPI, but pin for stability)
+pydantic>=2.0.0
+
+# Optional: For environment variables & configuration
+python-dotenv>=1.0.0
+
+# Optional: For database (you can comment/uncomment depending on what we use later)
+sqlalchemy>=2.0.0
