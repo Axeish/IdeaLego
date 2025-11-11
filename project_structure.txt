@@ -1,0 +1,24 @@
+idealego/
+│
+├── main.py                  # Entry point (FastAPI app)
+│
+├── requirements.txt         # Dependencies
+│
+├── app/
+│   ├── __init__.py
+│   ├── models.py            # Pydantic data models (Item, Set, ScheduleItem, etc.)
+│   ├── db.py                # Database setup (SQLAlchemy / in-memory placeholder)
+│   ├── routes/
+│   │   ├── __init__.py
+│   │   ├── items.py         # Routes for idea items
+│   │   ├── sets.py          # Routes for sets
+│   │   ├── schedule.py      # Routes for monthly schedule logic
+│   │   └── achievements.py  # (Optional later)
+│   ├── utils/
+│   │   ├── __init__.py
+│   │   └── helpers.py       # Month/date logic, filters, etc.
+│   └── schemas/
+│       ├── __init__.py
+│       └── responses.py     # Reusable response models
+│
+└── .env                     # (Optional) environment config

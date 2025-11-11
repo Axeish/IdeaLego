@@ -24,10 +24,9 @@ IdeaItem
 ```{
    "id": "id0001",
    "title": "zoda",
-   "description" :"plan to make entire zodiac series",
    "category":"cat001",
    "status" :"new",   //new, scheduled, completed, deleted
-   "isrepeating" : false,
+   "tags" : [ "a","b"],
    "priority": 'high',
    "createdat": "2025-11-10T10:05:00Z",
    "deadline": "2025-11-10T10:05:00Z",
@@ -42,6 +41,7 @@ ScheduleItem : once item can be scheduled for different months, repeatitive.
    "month" : "202511",
    "progress" : 40,
    "category" : "cat001"
+   "isrepeating" : false,
    "status" : "started"
    "assigneddate" : "2025-11-01T09:00:00Z",
    "deadline": "2025-11-20T23:59:00Z"
