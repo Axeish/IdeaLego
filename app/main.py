@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.routes import items, sets, schedule, month
+from app.routes import items, sets, schedule, month, achievements, categories
 
 app = FastAPI(
     title="IdeaLego API",
@@ -12,7 +12,8 @@ app.include_router(items.router, prefix="/items", tags=["Items"])
 app.include_router(sets.router, prefix="/sets", tags=["Sets"])
 app.include_router(schedule.router, prefix="/schedule", tags=["Schedule"])
 app.include_router(month.router, prefix="/analytics", tags=["Analytics"])
-
+app.include_router(achievements.router, prefix="/achievements", tags=["Achievements"])
+app.include_router(categories.router, prefix="/categories", tags=["Categories"])
 
 @app.get("/")
 def root():

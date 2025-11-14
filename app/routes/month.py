@@ -1,21 +1,35 @@
+# app/routes/month.py
 from fastapi import APIRouter
-from app.routes.sets import sets_db
 from typing import Dict
+from app.storage import db
 
 router = APIRouter()
 
 @router.get("/month/{month}/category_progress")
-def category_progress(month: str):
-    # Group sets by category
-    category_totals: Dict[str, list] = {}
-    for s in sets_db:
+def category_progress(month: str) -> Dict[str, int]:
+    """
+    Return average progress for each category for the given month.
+    Uses set.progress (recalculated on read).
+    """
+    category_map = {}
+    counts = {}
+    for s in db.sets_db:
         if s.month != month:
             continue
-        category_totals.setdefault(s.categoryId, []).append(s.progress)
+        # ensure s.progress is up-to-date by recomputing quickly
+        if not s.items:
+            prog = 0
+        else:
+            done = 0
+            for sched_id in s.items:
+                sch = next((x for x in db.schedule_db if x.id == sched_id), None)
+                if sch and sch.completed:
+                    done += 1
+            prog = int((done / len(s.items)) * 100)
+        key = s.categoryId or "uncategorized"
+        category_map[key] = category_map.get(key, 0) + prog
+        counts[key] = counts.get(key, 0) + 1
 
-    # Calculate average progress per category
-    category_progress = {
-        cat_id: int(sum(progress_list)/len(progress_list)) if progress_list else 0
-        for cat_id, progress_list in category_totals.items()
-    }
-    return category_progress
+    # average
+    result = {k: int(category_map[k] / counts[k]) for k in category_map} if counts else {}
+    return result

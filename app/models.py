@@ -5,11 +5,15 @@ from datetime import datetime
 class Category(BaseModel):
     id: str
     name: str
+    color: Optional[str] = None
     description: Optional[str] = None
+    createdAt: datetime = Field(default_factory=datetime.utcnow)
+    updatedAt: datetime = Field(default_factory=datetime.utcnow)
 
 class Item(BaseModel):
     id: str
     name: str
+    description: Optional[str] = None
     categoryId: str
     status: str = "idea"   # idea → scheduled → done
     priority: Optional[int] = None
@@ -37,6 +41,9 @@ class ScheduledItem(BaseModel):
     endDate: Optional[datetime] = None
     repeat: bool = False
     completed: bool = False
+    createdAt: datetime = Field(default_factory=datetime.utcnow)
+    updatedAt: datetime = Field(default_factory=datetime.utcnow)
+
 
 # -------------------------------
 # Achievement (completed items/sets)
@@ -46,4 +53,6 @@ class Achievement(BaseModel):
     itemId: Optional[str] = None
     setId: Optional[str] = None
     categoryId: str
+    month: str
     completedAt: datetime = Field(default_factory=datetime.utcnow)
+
