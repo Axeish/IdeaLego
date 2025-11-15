@@ -1,11 +1,14 @@
 from fastapi import FastAPI
 from app.routes import items, sets, schedule, month, achievements, categories
+from app.connection import engine
 
 app = FastAPI(
     title="IdeaLego API",
     version="1.0.0",
     description="Build ideas block by block: from concept ➡ schedule ➡ set ➡ done."
 )
+
+Base.metadata.create_all(bind=engine)
 
 # Register routers
 app.include_router(items.router, prefix="/items", tags=["Items"])

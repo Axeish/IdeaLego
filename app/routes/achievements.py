@@ -1,37 +1,28 @@
-from fastapi import APIRouter, HTTPException
-from typing import List
-from app.models import Achievement
-from datetime import datetime
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
 from app.storage import db
+from app.models import Achievement
 
 router = APIRouter()
 
-# Get all achievements
+@router.get("/")
+def get_all_achievements(database: Session = Depends(db.get_db)):
+    return db.get_achievements(database)
 
+@router.get("/{achievement_id}")
+def get_achievement(achievement_id: str, database: Session = Depends(db.get_db)):
+    obj = db.get_achievement(database, achievement_id)
+    if not obj:
+        raise HTTPException(status_code=404, detail="Achievement not found")
+    return obj
 
-@router.get("/", response_model=List[Achievement])
-def get_achievements():
-    return db.achievements_db
+@router.post("/")
+def create_achievement(achievement: Achievement, database: Session = Depends(db.get_db)):
+    return db.create_achievement(database, achievement)
 
-
-# Add a new achievement (usually called internally)
-def add_achievement(name: str, categoryId: str, month: str, itemId: str = None, setId: str = None):
-    ach = Achievement(
-        id=f"ach{len(db.achievements_db)+1:03d}",
-        itemId=itemId,
-        setId=setId,
-        name=name,
-        categoryId=categoryId,
-        month=month,
-        completedAt=datetime.utcnow()
-    )
-    db.achievements_db.append(ach)
-    return ach
-
-@router.delete("/{ach_id}")
-def delete_achievement(ach_id: str):
-    for ach in db.achievements_db:
-        if ach.id == ach_id:
-            db.achievements_db.remove(ach)
-            return {"message": f"Achievement {ach_id} deleted"}
-    raise HTTPException(status_code=404, detail="Achievement not found")
+@router.delete("/{achievement_id}")
+def delete_achievement(achievement_id: str, database: Session = Depends(db.get_db)):
+    deleted = db.delete_achievement(database, achievement_id)
+    if not deleted:
+        raise HTTPException(status_code=404, detail="Achievement not found")
+    return {"deleted": achievement_id}
