@@ -1,10 +1,9 @@
+# backend/app/models.py
 from sqlalchemy import Column, String, Integer, Boolean, DateTime, ForeignKey
-from sqlalchemy.orm import relationship, declarative_base
+from sqlalchemy.orm import relationship
 from datetime import datetime
 
-from typing import Optional, List
-
-Base = declarative_base()
+from app.connection import Base
 
 class Category(Base):
     __tablename__ = "categories"
@@ -15,15 +14,15 @@ class Category(Base):
     createdAt = Column(DateTime, default=datetime.utcnow)
     updatedAt = Column(DateTime, default=datetime.utcnow)
 
-    items = relationship("Item", back_populates="category")
-    sets = relationship("Set", back_populates="category")
+    items = relationship("Item", back_populates="category", cascade="all, delete-orphan")
+    sets = relationship("Set", back_populates="category", cascade="all, delete-orphan")
 
 class Item(Base):
     __tablename__ = "items"
     id = Column(String, primary_key=True, index=True)
     name = Column(String, nullable=False)
     description = Column(String, nullable=True)
-    categoryId = Column(String, ForeignKey("categories.id"))
+    categoryId = Column(String, ForeignKey("categories.id"), nullable=True)
     status = Column(String, default="idea")  # idea → scheduled → done
     priority = Column(Integer, nullable=True)
     tags = Column(String, default="")        # Store as comma-separated string
@@ -37,7 +36,7 @@ class Set(Base):
     __tablename__ = "sets"
     id = Column(String, primary_key=True, index=True)
     name = Column(String, nullable=False)
-    categoryId = Column(String, ForeignKey("categories.id"))
+    categoryId = Column(String, ForeignKey("categories.id"), nullable=True)
     month = Column(String, nullable=True)  # "2025-11" format
     progress = Column(Integer, default=0)
     createdAt = Column(DateTime, default=datetime.utcnow)
@@ -48,7 +47,7 @@ class Set(Base):
 class ScheduledItem(Base):
     __tablename__ = "scheduled_items"
     id = Column(String, primary_key=True, index=True)
-    itemId = Column(String, ForeignKey("items.id"))
+    itemId = Column(String, ForeignKey("items.id"), nullable=False)
     setId = Column(String, ForeignKey("sets.id"), nullable=True)
     month = Column(String, nullable=False)
     startDate = Column(DateTime, nullable=True)
@@ -63,8 +62,6 @@ class Achievement(Base):
     id = Column(String, primary_key=True, index=True)
     itemId = Column(String, ForeignKey("items.id"), nullable=True)
     setId = Column(String, ForeignKey("sets.id"), nullable=True)
-    categoryId = Column(String, ForeignKey("categories.id"))
+    categoryId = Column(String, ForeignKey("categories.id"), nullable=True)
     month = Column(String, nullable=False)
     completedAt = Column(DateTime, default=datetime.utcnow)
-
-

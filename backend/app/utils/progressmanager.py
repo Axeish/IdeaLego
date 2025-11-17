@@ -1,8 +1,8 @@
 from datetime import datetime
 from copy import deepcopy
-from app.storage import db
+from backend.app.storage import db
 
-from app.routes.achievements import add_achievement
+from backend.app.routes.achievements import add_achievement
 
 class ProgressManager:
     """
@@ -92,7 +92,7 @@ class ProgressManager:
             mon = 1
             year += 1
         new_sched = deepcopy(sched_item)
-        new_sched.id = f"{sched_item.id}_next_{len(db.schedule_db)+1}"
+        new_sched.id = f"{sched_item.id}_next_{len(db.schedule_db) + 1}"
         new_sched.month = f"{year}-{mon:02d}"
         new_sched.completed = False
         new_sched.createdAt = datetime.utcnow()
