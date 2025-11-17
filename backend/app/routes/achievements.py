@@ -1,14 +1,14 @@
 # backend/app/routes/achievements.py
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from typing import List
+from app.models import Achievement
 
 from app import crud, schemas
 from app.db import get_db
 
 router = APIRouter()
 
-@router.get("/", response_model=List[schemas.AchievementRead])
+@router.get("/", response_model=list[schemas.AchievementRead])
 def read_achievements(db: Session = Depends(get_db)):
     return crud.get_achievements(db)
 
@@ -20,9 +20,12 @@ def read_achievement(achievement_id: str, db: Session = Depends(get_db)):
     return obj
 
 @router.post("/", response_model=schemas.AchievementRead)
-def create_achievement(achievement: schemas.AchievementCreate, db: Session = Depends(get_db)):
-    return crud.create_achievement(db, achievement)
-
+def create_achievement(payload: schemas.AchievementCreate, db: Session = Depends(get_db)):
+    obj = Achievement(**payload.model_dump())
+    db.add(obj)
+    db.commit()
+    db.refresh(obj)
+    return obj
 @router.delete("/{achievement_id}")
 def delete_achievement(achievement_id: str, db: Session = Depends(get_db)):
     deleted = crud.delete_achievement(db, achievement_id)

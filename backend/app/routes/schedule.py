@@ -1,14 +1,14 @@
 # backend/app/routes/schedule.py
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from typing import List
+from app.models import ScheduledItem
 
 from app import crud, schemas
 from app.db import get_db
 
 router = APIRouter()
 
-@router.get("/", response_model=List[schemas.ScheduledItemRead])
+@router.get("/", response_model=list[schemas.ScheduledItemRead])
 def read_scheduled_items(db: Session = Depends(get_db)):
     return crud.get_scheduled_items(db)
 
@@ -20,9 +20,12 @@ def read_scheduled_item(scheduled_id: str, db: Session = Depends(get_db)):
     return obj
 
 @router.post("/", response_model=schemas.ScheduledItemRead)
-def create_scheduled_item(scheduled_item: schemas.ScheduledItemCreate, db: Session = Depends(get_db)):
-    return crud.create_scheduled_item(db, scheduled_item)
-
+def create_scheduled_item(payload: schemas.ScheduledItemCreate, db: Session = Depends(get_db)):
+    obj = ScheduledItem(**payload.model_dump())
+    db.add(obj)
+    db.commit()
+    db.refresh(obj)
+    return obj
 @router.delete("/{scheduled_id}")
 def delete_scheduled_item(scheduled_id: str, db: Session = Depends(get_db)):
     deleted = crud.delete_scheduled_item(db, scheduled_id)

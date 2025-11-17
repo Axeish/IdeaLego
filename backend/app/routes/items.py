@@ -1,14 +1,16 @@
 # backend/app/routes/items.py
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from typing import List
+
 
 from app import crud, schemas
+
+from app.models import Item
 from app.db import get_db
 
 router = APIRouter()
 
-@router.get("/", response_model=List[schemas.ItemRead])
+@router.get("/", response_model=list[schemas.ItemRead])
 def read_items(db: Session = Depends(get_db)):
     return crud.get_items(db)
 
@@ -20,8 +22,13 @@ def read_item(item_id: str, db: Session = Depends(get_db)):
     return obj
 
 @router.post("/", response_model=schemas.ItemRead)
-def create_item(item: schemas.ItemCreate, db: Session = Depends(get_db)):
-    return crud.create_item(db, item)
+def create_item(payload : schemas.ItemCreate, db: Session = Depends(get_db)):
+
+    obj = Item(**payload.model_dump())
+    db.add(obj)
+    db.commit()
+    db.refresh(obj)
+    return obj
 
 @router.delete("/{item_id}")
 def delete_item(item_id: str, db: Session = Depends(get_db)):

@@ -1,35 +1,31 @@
-# app/routes/month.py
-from fastapi import APIRouter
-from typing import Dict
-from app.storage import db
+from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
+from app import crud, schemas
+from app.models import Item, Set, Achievement
+from app.db import get_db
 
 router = APIRouter()
 
-@router.get("/month/{month}/category_progress")
-def category_progress(month: str) -> Dict[str, int]:
-    """
-    Return average progress for each category for the given month.
-    Uses set.progress (recalculated on read).
-    """
-    category_map = {}
-    counts = {}
-    for s in db.sets_db:
-        if s.month != month:
-            continue
-        # ensure s.progress is up-to-date by recomputing quickly
-        if not s.items:
-            prog = 0
-        else:
-            done = 0
-            for sched_id in s.items:
-                sch = next((x for x in db.schedule_db if x.id == sched_id), None)
-                if sch and sch.completed:
-                    done += 1
-            prog = int((done / len(s.items)) * 100)
-        key = s.categoryId or "uncategorized"
-        category_map[key] = category_map.get(key, 0) + prog
-        counts[key] = counts.get(key, 0) + 1
+@router.get("/", response_model=list[schemas.MonthlySummary])
+def get_monthly_summary(db: Session = Depends(get_db)):
+    # For simplicity, assume 'month' column is "YYYY-MM"
+    results = []
 
-    # average
-    result = {k: int(category_map[k] / counts[k]) for k in category_map} if counts else {}
-    return result
+    months = db.query(Item.month).distinct().all()  # or generate last 12 months
+
+    for (month,) in months:
+        total_items = db.query(Item).filter(Item.deadline.startswith(month)).count()
+        completed_items = db.query(Item).filter(Item.deadline.startswith(month), Item.status=="done").count()
+        total_sets = db.query(Set).filter(Set.month==month).count()
+        completed_sets = db.query(Set).filter(Set.month==month, Set.progress==100).count()
+        achievements = db.query(Achievement).filter(Achievement.month==month).count()
+
+        results.append(schemas.MonthlySummary(
+            month=month,
+            total_items=total_items,
+            completed_items=completed_items,
+            total_sets=total_sets,
+            completed_sets=completed_sets,
+            achievements=achievements
+        ))
+    return results

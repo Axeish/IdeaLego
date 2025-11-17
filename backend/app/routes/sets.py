@@ -1,14 +1,14 @@
 # backend/app/routes/sets.py
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from typing import List
+from app.models import Set
 
 from app import crud, schemas
 from app.db import get_db
 
 router = APIRouter()
 
-@router.get("/", response_model=List[schemas.SetRead])
+@router.get("/", response_model=list[schemas.SetRead])
 def read_sets(db: Session = Depends(get_db)):
     return crud.get_sets(db)
 
@@ -20,8 +20,12 @@ def read_set(set_id: str, db: Session = Depends(get_db)):
     return obj
 
 @router.post("/", response_model=schemas.SetRead)
-def create_set(set_in: schemas.SetCreate, db: Session = Depends(get_db)):
-    return crud.create_set(db, set_in)
+def create_set(payload: schemas.SetCreate, db: Session = Depends(get_db)):
+    obj = Set(**payload.model_dump())
+    db.add(obj)
+    db.commit()
+    db.refresh(obj)
+    return obj
 
 @router.delete("/{set_id}")
 def delete_set(set_id: str, db: Session = Depends(get_db)):

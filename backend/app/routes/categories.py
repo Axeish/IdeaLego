@@ -1,14 +1,15 @@
 # backend/app/routes/categories.py
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from typing import List
+
 
 from app import crud, schemas
 from app.db import get_db
+from app.models import Category
 
 router = APIRouter()
 
-@router.get("/", response_model=List[schemas.CategoryRead])
+@router.get("/", response_model=list[schemas.CategoryRead])
 def read_categories(db: Session = Depends(get_db)):
     return crud.get_categories(db)
 
@@ -20,8 +21,12 @@ def read_category(category_id: str, db: Session = Depends(get_db)):
     return obj
 
 @router.post("/", response_model=schemas.CategoryRead)
-def create_category(category: schemas.CategoryCreate, db: Session = Depends(get_db)):
-    return crud.create_category(db, category)
+def create_category(payload: schemas.CategoryCreate, db: Session = Depends(get_db)):
+    obj = Category(**payload.model_dump())
+    db.add(obj)
+    db.commit()
+    db.refresh(obj)
+    return obj
 
 @router.delete("/{category_id}")
 def delete_category(category_id: str, db: Session = Depends(get_db)):
