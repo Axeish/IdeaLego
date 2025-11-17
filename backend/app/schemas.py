@@ -1,32 +1,34 @@
 # backend/app/schemas.py
 from pydantic import BaseModel
-from typing import Optional, List
+from typing import Optional
 from datetime import datetime
 
 # -------------------------
 # Category
 # -------------------------
-class CategoryBase(BaseModel):
-    id: str
+
+class CategoryCreate(BaseModel):
     name: str
     color: Optional[str] = None
     description: Optional[str] = None
 
-class CategoryCreate(CategoryBase):
-    pass
-
-class CategoryRead(CategoryBase):
+class CategoryRead(BaseModel):
+    id: str
+    name: str
+    color: Optional[str]
+    description: Optional[str]
     createdAt: Optional[datetime]
     updatedAt: Optional[datetime]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
+
 
 # -------------------------
 # Item
 # -------------------------
-class ItemBase(BaseModel):
-    id: str
+
+class ItemCreate(BaseModel):
     name: str
     description: Optional[str] = None
     categoryId: Optional[str] = None
@@ -35,41 +37,50 @@ class ItemBase(BaseModel):
     tags: Optional[str] = ""
     deadline: Optional[datetime] = None
 
-class ItemCreate(ItemBase):
-    pass
-
-class ItemRead(ItemBase):
+class ItemRead(BaseModel):
+    id: str
+    name: str
+    description: Optional[str]
+    categoryId: Optional[str]
+    status: Optional[str]
+    priority: Optional[int]
+    tags: Optional[str]
+    deadline: Optional[datetime]
     createdAt: Optional[datetime]
     updatedAt: Optional[datetime]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
+
 
 # -------------------------
 # Set
 # -------------------------
-class SetBase(BaseModel):
-    id: str
+
+class SetCreate(BaseModel):
     name: str
-    categoryId: Optional[str] = None
-    month: Optional[str] = None
+    categoryId: Optional[str]
+    month: Optional[str]
     progress: Optional[int] = 0
 
-class SetCreate(SetBase):
-    pass
-
-class SetRead(SetBase):
+class SetRead(BaseModel):
+    id: str
+    name: str
+    categoryId: Optional[str]
+    month: Optional[str]
+    progress: Optional[int]
     createdAt: Optional[datetime]
     updatedAt: Optional[datetime]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
+
 
 # -------------------------
-# ScheduledItem
+# Scheduled Item
 # -------------------------
-class ScheduledItemBase(BaseModel):
-    id: str
+
+class ScheduledItemCreate(BaseModel):
     itemId: str
     setId: Optional[str] = None
     month: str
@@ -78,30 +89,39 @@ class ScheduledItemBase(BaseModel):
     repeat: Optional[bool] = False
     completed: Optional[bool] = False
 
-class ScheduledItemCreate(ScheduledItemBase):
-    pass
-
-class ScheduledItemRead(ScheduledItemBase):
+class ScheduledItemRead(BaseModel):
+    id: str
+    itemId: str
+    setId: Optional[str]
+    month: str
+    startDate: Optional[datetime]
+    endDate: Optional[datetime]
+    repeat: Optional[bool]
+    completed: Optional[bool]
     createdAt: Optional[datetime]
     updatedAt: Optional[datetime]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
+
 
 # -------------------------
 # Achievement
 # -------------------------
-class AchievementBase(BaseModel):
-    id: str
+
+class AchievementCreate(BaseModel):
     itemId: Optional[str] = None
     setId: Optional[str] = None
     categoryId: Optional[str] = None
     month: str
-    completedAt: Optional[datetime] = None
 
-class AchievementCreate(AchievementBase):
-    pass
+class AchievementRead(BaseModel):
+    id: str
+    itemId: Optional[str]
+    setId: Optional[str]
+    categoryId: Optional[str]
+    month: str
+    completedAt: Optional[datetime]
 
-class AchievementRead(AchievementBase):
     class Config:
-        orm_mode = True
+        from_attributes = True

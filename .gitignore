@@ -1,1 +1,4 @@
-/db/sqlite/
+/backend/db/sqlite/
+/backend/app/db/sqlite/
+/backend/app/__pycache__
+/backend/app/.DS_Store
