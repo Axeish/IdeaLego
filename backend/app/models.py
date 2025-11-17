@@ -2,12 +2,12 @@
 from sqlalchemy import Column, String, Integer, Boolean, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 from datetime import datetime
-
+import uuid
 from app.connection import Base
 
 class Category(Base):
     __tablename__ = "categories"
-    id = Column(String, primary_key=True, index=True)
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     name = Column(String, nullable=False)
     color = Column(String, nullable=True)
     description = Column(String, nullable=True)
@@ -19,7 +19,7 @@ class Category(Base):
 
 class Item(Base):
     __tablename__ = "items"
-    id = Column(String, primary_key=True, index=True)
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     name = Column(String, nullable=False)
     description = Column(String, nullable=True)
     categoryId = Column(String, ForeignKey("categories.id"), nullable=True)
@@ -34,7 +34,7 @@ class Item(Base):
 
 class Set(Base):
     __tablename__ = "sets"
-    id = Column(String, primary_key=True, index=True)
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     name = Column(String, nullable=False)
     categoryId = Column(String, ForeignKey("categories.id"), nullable=True)
     month = Column(String, nullable=True)  # "2025-11" format
@@ -46,7 +46,7 @@ class Set(Base):
 
 class ScheduledItem(Base):
     __tablename__ = "scheduled_items"
-    id = Column(String, primary_key=True, index=True)
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     itemId = Column(String, ForeignKey("items.id"), nullable=False)
     setId = Column(String, ForeignKey("sets.id"), nullable=True)
     month = Column(String, nullable=False)
@@ -59,7 +59,7 @@ class ScheduledItem(Base):
 
 class Achievement(Base):
     __tablename__ = "achievements"
-    id = Column(String, primary_key=True, index=True)
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     itemId = Column(String, ForeignKey("items.id"), nullable=True)
     setId = Column(String, ForeignKey("sets.id"), nullable=True)
     categoryId = Column(String, ForeignKey("categories.id"), nullable=True)

@@ -23,7 +23,7 @@ def read_item(item_id: str, db: Session = Depends(get_db)):
 
 @router.post("/", response_model=schemas.ItemRead)
 def create_item(payload : schemas.ItemCreate, db: Session = Depends(get_db)):
-
+    print(payload.model_dump())
     obj = Item(**payload.model_dump())
     db.add(obj)
     db.commit()

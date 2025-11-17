@@ -1,5 +1,6 @@
 # backend/app/main.py
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from app.connection import engine, Base
 
 # import routers
@@ -10,6 +11,20 @@ app = FastAPI(
     version="1.0.0",
     description="Build ideas block by block: from concept ➡ schedule ➡ set ➡ done."
 )
+
+origins = [
+    "http://localhost:5173",
+    # you can add more origins if needed
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,  # or ["*"] to allow all (not recommended for production)
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 # create all tables
 Base.metadata.create_all(bind=engine)
